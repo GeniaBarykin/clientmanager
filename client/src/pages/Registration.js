@@ -14,9 +14,7 @@ export const Registration = () =>{
         e.preventDefault();
         axios.post('http://localhost:8081/api/registration', values)
         .then(res => {
-            // localStorage.setItem("secret-key", res.data.token);
-            // console.log(11,localStorage.getItem('secret-key'))
-            // navigate("/home");
+            localStorage.setItem("access-token", res.data.token);
         })
         .then(err => console.log(err))
     }

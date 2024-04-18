@@ -1,3 +1,9 @@
+const bcrypt = require('bcryptjs')
+require('dotenv').config()
+const userDto = require('../dtos/user-dto')
+const tokenService =require('../service/token-service')
+const UserDto = require('../dtos/user-dto')
+
 class UserController {
 
     async registration(req, res, next){
@@ -14,16 +20,21 @@ class UserController {
                 db.get('SELECT * FROM users WHERE login=?', [login], (error, userDB) => {
                     if (error) throw error;
                     if (userDB == undefined) {
+                        const SALT = Number(process.env.SALT);
+                        const hashPassword = bcrypt.hashSync(password, SALT);
                         db.run(`INSERT INTO users (fio, login , password) VALUES (?,?,?)`,
-                        [fio, login, password],
+                        [fio, login, hashPassword],
                         function (err, result) {
                             if (err) {
                                 res.status(400).json({ "error": err.message })
                                 return;
-                            }                            
+                            }      
+                            const userDto = new UserDto({fio: fio, login: login})
+                            const tokens = tokenService.generateTokens({...userDto})
+                            tokenService.saveToken(userDto.login, db, tokens.refreshToken)
+                            res.cookie('refreshToken', tokens.refreshToken, {maxAge: 30*24*60*60*1000, httpOnly: true})
                             res.status(201).json({                                
-                                "login": login
-                                /// TOKEN
+                                "token":  tokens.accessToken                       
                             })
                         });
                     } else {
@@ -34,7 +45,34 @@ class UserController {
         catch (e){console.log(e)}
     }
     async login(req, res, next){
-        try {}
+        try {
+            const db = req.db
+            const {login, password} = req.body 
+            if (login == undefined || login == ''){
+                res.status(403).json({error: "Empty login"});
+            } else if (password == undefined || password == ''){
+                res.status(403).json({error: "Empty password"});
+            } else {
+                db.get('SELECT * FROM users WHERE login=?', [login], async (error, userDB) => {
+                    if (error) throw error;
+                    if (userDB == undefined) {
+                        res.status(401).json({error: "No such user"});
+                    } else {
+                        const passwordEquals = await bcrypt.compare(password, userDB.password)
+                        if (passwordEquals) {
+                            const userDto = new UserDto({fio: userDB.fio, login: login})
+                            const tokens = tokenService.generateTokens({...userDto})
+                            tokenService.saveToken(userDto.login, db, tokens.refreshToken)
+                            res.cookie('refreshToken', tokens.refreshToken, {maxAge: 30*24*60*60*1000, httpOnly: true})
+                            res.status(201).json({                                
+                                "token":  tokens.accessToken                       
+                            })
+                        } else {
+                            res.status(401).json({error: "Wrong password"});
+                        }
+                    }});
+            }
+        }
         catch (e){console.log(e)}
     }
     async logout(req, res, next){
