@@ -18,22 +18,46 @@ class TokenService{
                 db.run(`INSERT INTO tokens (user,refreshToken) VALUES (?,?)`,
                 [userID, refreshToken],
                 function (error, result) {
-                    if (error) throw error;                          
-                    //do smth
+                    if (error) throw error;
                     console.log("token created")
                 });
             } else {
                 db.run(`UPDATE tokens set refreshToken=? where user=?`,
                 [refreshToken, userID],
                 function (error, result) {
-                    if (error) throw error;                          
-                    //do smth
+                    if (error) throw error;
                     console.log("token refreshed")
                 });
             }
         })
     }
 
+    async removeToken(refreshToken, db){
+        db.run(`DELETE FROM tokens where refreshToken=?`,
+                [refreshToken],
+                function (error, result) {
+                    if (error) throw error; 
+                    console.log("token removed")
+                });
+    }
+
+    validateAccessToken(token){
+        try {
+            const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET)
+            return userData
+        } catch (error) {
+            return null;
+        }
+    }
+
+    validateRefreshToken(token){
+        try {
+            const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
+            return userData
+        } catch (error) {
+            return null;
+        }
+    }
 
 }
 

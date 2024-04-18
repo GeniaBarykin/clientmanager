@@ -76,21 +76,43 @@ class UserController {
         catch (e){console.log(e)}
     }
     async logout(req, res, next){
-        try {}
+        try {
+            const db = req.db
+            const {refreshToken} =req.cookies;
+            const token = await tokenService.removeToken(refreshToken, db)
+            res.clearCookie('refreshToken');
+            return res.status(200).json({"logout": "success"})
+        }
         catch (e){console.log(e)}
     }
     async refresh(req, res, next){
-        try {}
-        catch (e){console.log(e)}
-    }
-
-    async getUsers(req, res, next){
-        try { 
-            req.db.all('SELECT * FROM users', (error, usersDB) => {
-                if (error) throw error;
-                res.json(usersDB);
-            })
+        try {
+            const db = req.db
+            const {refreshToken} =req.cookies;
+            if(!refreshToken) {
+                res.status(401).json({error: "No token found"});
             }
+            const userData = tokenService.validateRefreshToken(refreshToken)
+            if (userData){
+                db.get('SELECT * FROM tokens WHERE refreshToken=?', [refreshToken], (error, tokenDB) => {
+                    if (error) throw error;
+                    if (tokenDB) {
+                        db.get('SELECT fio, login FROM users WHERE login=?', [tokenDB.user], (error, userDB) => {
+                            if (error) throw error;
+                            const userDto = new UserDto({fio: userDB.fio, login: userDB.login})
+                            const tokens = tokenService.generateTokens({...userDto})
+                            tokenService.saveToken(userDto.login, db, tokens.refreshToken)
+                            res.cookie('refreshToken', tokens.refreshToken, {maxAge: 30*24*60*60*1000, httpOnly: true})
+                            res.status(201).json({                                
+                                "token":  tokens.accessToken                       
+                        })
+                        })                        
+                    }
+                });
+            } else {
+                res.status(401).json({error: "Invalid token"});
+            }            
+        }
         catch (e){console.log(e)}
     }
 }
