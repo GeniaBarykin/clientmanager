@@ -13,8 +13,7 @@ export const Login = () =>{
         e.preventDefault();
         axios.post('http://localhost:8081/auth', values)
         .then(res => {
-            localStorage.setItem("secret-key", res.data.token);
-            console.log(11,localStorage.getItem('secret-key'))
+            localStorage.setItem("token", res.data.token);
             navigate("/home");
         })
         .then(err => console.log(err))
@@ -25,7 +24,7 @@ export const Login = () =>{
         <input type="text" onChange={e => setValues({...values, login: e.target.value})}></input>
         <label>Password</label>
         <input type="password" onChange={e => setValues({...values, password: e.target.value})}></input>
-        <button>Register</button>
+        <button>Login</button>
         </form>
     </div>
 }
