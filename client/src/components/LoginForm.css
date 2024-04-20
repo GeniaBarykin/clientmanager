@@ -1,0 +1,6 @@
+.login-main-div {
+    display: block;
+    justify-content: center;
+    flex-wrap: column wrap;
+    text-align: center;
+}

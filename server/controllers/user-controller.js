@@ -34,8 +34,9 @@ class UserController {
                             tokenService.saveToken(userDto.login, db, tokens.refreshToken)
                             res.cookie('refreshToken', tokens.refreshToken, {maxAge: 30*24*60*60*1000, httpOnly: true})
                             res.status(201).json({                                
-                                "token":  tokens.accessToken                       
-                            })
+                                ...tokens,
+                                user: userDto                     
+                        })
                         });
                     } else {
                         res.status(403).json({error: "Login already exists"});
@@ -65,8 +66,9 @@ class UserController {
                             tokenService.saveToken(userDto.login, db, tokens.refreshToken)
                             res.cookie('refreshToken', tokens.refreshToken, {maxAge: 30*24*60*60*1000, httpOnly: true})
                             res.status(201).json({                                
-                                "token":  tokens.accessToken                       
-                            })
+                                ...tokens,
+                                user: userDto                     
+                        })
                         } else {
                             res.status(401).json({error: "Wrong password"});
                         }
@@ -104,7 +106,8 @@ class UserController {
                             tokenService.saveToken(userDto.login, db, tokens.refreshToken)
                             res.cookie('refreshToken', tokens.refreshToken, {maxAge: 30*24*60*60*1000, httpOnly: true})
                             res.status(201).json({                                
-                                "token":  tokens.accessToken                       
+                                ...tokens,
+                                user: userDto                     
                         })
                         })                        
                     }

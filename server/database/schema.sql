@@ -28,7 +28,7 @@ insert or replace into clients(nomer_scheta, familiya, imya, otchestvo, dateofbi
   "test otchestvo",
   "2000-16-02 12:12:12",
   "111122223333",
-  "Valentinov Valentin Valentinovich",
+  "Admin Adminovich Adminov",
   0
 );
 
@@ -40,6 +40,17 @@ insert or replace into clients(nomer_scheta, familiya, imya, otchestvo, dateofbi
   "2001-16-02 12:12:12",
   "111122223334",
   "Arkadiy Arkadievich Arkadiev",
+  0
+);
+
+insert or replace into clients(nomer_scheta, familiya, imya, otchestvo, dateofbirth,inn,fio_responsible, status) values(
+  03,
+  "Корона",
+  "Вирус",
+  "Опасен",
+  "2020-16-02 12:12:12",
+  "111122225555",
+  "Admin Adminovich Adminov",
   0
 );
 

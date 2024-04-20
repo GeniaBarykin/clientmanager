@@ -7,7 +7,7 @@ const router = new Router();
 router.post('/registration', userController.registration)
 router.post('/login', userController.login)
 router.post('/logout', userController.logout)
-router.post('/refresh', userController.refresh)
-router.get('/clients', authMiddleware, clientController.getClients)
-
+router.get('/refresh', userController.refresh)
+router.post('/clients', authMiddleware, clientController.getClients)
+router.post('/changestatus', authMiddleware, clientController.changeStatus)
 module.exports = router
