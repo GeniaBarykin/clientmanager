@@ -8,17 +8,15 @@
 
 ## Запуск
 
-Для сервера:
-``
-cd server
-npm install 
-npm run dev
-``
-Для клиента
-``
-../cd client
-npm install 
-npm run start
-``
+Для сервера: <br>
+
+`` cd server ``<br>
+`` npm install ``<br>
+`` npm run dev ``<br>
+
+Для клиента <br>
+``../cd client`` <br>
+``npm install``  <br>
+``npm run start`` <br>
 
 
